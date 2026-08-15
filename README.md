@@ -181,15 +181,19 @@ void loop() {
 
 ## Android app
 
-Built in **MIT App Inventor** (`ai2.appinventor.mit.edu`). Source: `app/VisionGuard.aia`
+Built in **MIT App Inventor** (`ai2.appinventor.mit.edu`). A complete,
+block-by-block build guide is in **`app/BUILD_GUIDE.md`** — follow it to
+reproduce the app and export your own `app/VisionGuard.aia`.
 
 Features:
-- Live distance readout from the cane
+- Live distance readout from the cane (updates ~5×/second)
 - Clear / obstacle status panel
-- SOS button — sends an SMS with location to a saved contact
+- GPS location readout
+- SOS button — sends an SMS with location to a saved family contact
 - Connection status
+- Demo mode — simulated readings so the app runs with no hardware attached
 
-Pairing is done in Android Bluetooth settings (passcode `1234`), not inside the app. The app then connects to the already-paired HC-05.
+Pairing is done in Android Bluetooth settings (passcode `1234`), not inside the app. The app then connects to the already-paired HC-05 and polls it for distance lines. See `app/README.md` for an overview and `app/BUILD_GUIDE.md` for the full build.
 
 ---
 
@@ -202,7 +206,10 @@ vision-guard/
 ├── glasses/
 │   └── glasses.ino           Arduino sketch for the sensor glasses
 ├── app/
-│   └── VisionGuard.aia       MIT App Inventor project file
+│   ├── BUILD_GUIDE.md        Step-by-step MIT App Inventor build guide
+│   ├── README.md             App overview and features
+│   ├── screen-mockup.svg     Visual mockup of the app screen
+│   └── VisionGuard.aia       (export your own from the build guide)
 ├── docs/
 │   ├── wiring-diagram.png
 │   └── build-photos/
