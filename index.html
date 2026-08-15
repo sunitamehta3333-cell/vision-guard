@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vision Guard — assistive mobility kit</title>
+<meta name="description" content="Vision Guard: a smart cane and sensor glasses for visually impaired users, with a family companion app — live distance, obstacle alerts, GPS and SOS.">
+<style>
+  :root{
+    --bg:#0f172a; --card:#ffffff; --ink:#0f172a; --muted:#64748b;
+    --line:#e2e8f0; --green:#16a34a; --red:#dc2626; --blue:#2563eb;
+    --accent:#0ea5e9;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink); background:#f1f5f9; line-height:1.55;
+  }
+  a{color:var(--blue)}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 20px}
+
+  /* header */
+  header.hero{
+    background:linear-gradient(160deg,#0f172a 0%,#1e293b 60%,#0e7490 100%);
+    color:#fff;padding:64px 0 72px;
+  }
+  .hero h1{font-size:clamp(2rem,6vw,3.4rem);margin:0 0 12px;font-weight:800;letter-spacing:-.02em}
+  .hero p.tag{font-size:clamp(1.05rem,2.5vw,1.3rem);color:#cbd5e1;max-width:640px;margin:0 0 28px}
+  .badges{display:flex;gap:10px;flex-wrap:wrap}
+  .badge{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
+    padding:6px 12px;border-radius:999px;font-size:.85rem;color:#e2e8f0}
+  .cta{display:inline-flex;gap:10px;flex-wrap:wrap;margin-top:28px}
+  .btn{display:inline-block;padding:12px 20px;border-radius:10px;font-weight:700;text-decoration:none}
+  .btn.primary{background:#fff;color:#0f172a}
+  .btn.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.35)}
+
+  /* layout */
+  section{padding:56px 0}
+  section h2{font-size:1.6rem;margin:0 0 6px;font-weight:800}
+  section .sub{color:var(--muted);margin:0 0 28px}
+
+  /* demo */
+  .demo-grid{display:grid;grid-template-columns:320px 1fr;gap:32px;align-items:start}
+  @media(max-width:760px){.demo-grid{grid-template-columns:1fr}}
+  .phone{
+    background:var(--card);border:1px solid var(--line);border-radius:24px;
+    padding:16px;box-shadow:0 20px 40px -20px rgba(15,23,42,.35);
+  }
+  .p-title{text-align:center;font-weight:800;font-size:1.4rem;margin:6px 0 14px}
+  .conn{display:flex;align-items:center;gap:8px;justify-content:center;font-weight:700;margin-bottom:14px}
+  .dot{width:10px;height:10px;border-radius:50%;background:var(--red)}
+  .conn.on .dot{background:var(--green)}
+  .conn .state{color:var(--red)}
+  .conn.on .state{color:var(--green)}
+  .status{
+    border-radius:16px;height:150px;display:flex;align-items:center;justify-content:center;
+    color:#fff;font-size:2.6rem;font-weight:800;letter-spacing:.02em;background:#94a3b8;
+    transition:background-color .25s ease;
+  }
+  .status.clear{background:var(--green)}
+  .status.obstacle{background:var(--red)}
+  .dist{text-align:center;margin:16px 0 6px}
+  .dist .label{color:var(--muted);font-size:.9rem}
+  .dist .val{font-size:2.4rem;font-weight:800}
+  .loc{text-align:center;color:var(--muted);font-size:.92rem;margin-bottom:14px;min-height:1.3em}
+  .sos{
+    width:100%;border:0;border-radius:14px;background:var(--red);color:#fff;
+    font-size:1.2rem;font-weight:800;padding:16px;cursor:pointer;
+  }
+  .sos:active{transform:translateY(1px)}
+  .row{display:flex;gap:8px;margin-top:14px}
+  .row input{flex:1;padding:10px;border:1px solid var(--line);border-radius:10px;font-size:1rem}
+  .toggle{display:flex;align-items:center;justify-content:space-between;margin-top:16px;
+    padding-top:14px;border-top:1px solid var(--line)}
+  .switch{position:relative;width:52px;height:28px}
+  .switch input{opacity:0;width:0;height:0}
+  .slider{position:absolute;inset:0;background:#94a3b8;border-radius:999px;cursor:pointer;transition:.2s}
+  .slider::before{content:"";position:absolute;height:22px;width:22px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+  .switch input:checked + .slider{background:var(--accent)}
+  .switch input:checked + .slider::before{transform:translateX(24px)}
+  .demo-note{color:var(--muted);font-size:.95rem}
+  .demo-note code{background:#e2e8f0;padding:1px 6px;border-radius:5px}
+
+  /* features */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+  .card h3{margin:0 0 6px;font-size:1.1rem}
+  .card p{margin:0;color:var(--muted);font-size:.95rem}
+  .ico{font-size:1.6rem}
+
+  /* table */
+  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line)}
+  th{background:#f8fafc;font-size:.9rem;color:var(--muted)}
+  tr:last-child td{border-bottom:0}
+
+  footer{background:#0f172a;color:#cbd5e1;padding:40px 0;margin-top:20px}
+  footer a{color:#7dd3fc}
+  .muted{color:var(--muted)}
+  .pill{display:inline-block;background:#ecfeff;color:#0e7490;border:1px solid #a5f3fc;
+    padding:4px 10px;border-radius:999px;font-size:.8rem;font-weight:700}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="pill" style="background:rgba(255,255,255,.12);color:#e2e8f0;border-color:rgba(255,255,255,.25)">School project prototype</span>
+    <h1>Vision Guard</h1>
+    <p class="tag">An assistive mobility kit for visually impaired users — a smart cane and sensor glasses that cover the full hazard envelope, from the ground to above head height, with a companion app for the family.</p>
+    <div class="badges">
+      <span class="badge">Ultrasonic sensing</span>
+      <span class="badge">Arduino + HC-05</span>
+      <span class="badge">MIT App Inventor app</span>
+      <span class="badge">GPS + SOS</span>
+    </div>
+    <div class="cta">
+      <a class="btn primary" href="#demo">Try the live demo</a>
+      <a class="btn ghost" href="https://github.com/sunitamehta3333-cell/vision-guard" target="_blank" rel="noopener">View on GitHub</a>
+    </div>
+  </div>
+</header>
+
+<!-- LIVE DEMO -->
+<section id="demo">
+  <div class="wrap">
+    <h2>Live demo — the companion app</h2>
+    <p class="sub">This is a browser preview of the family app's dashboard. Turn on <strong>Demo mode</strong> to stream simulated sensor readings, exactly as the real cane would over Bluetooth.</p>
+
+    <div class="demo-grid">
+      <!-- phone -->
+      <div class="phone" role="group" aria-label="Vision Guard app preview">
+        <div class="p-title">Vision Guard</div>
+
+        <div class="conn" id="conn">
+          <span class="dot"></span>
+          <span>Cane:</span>
+          <span class="state" id="connState">Disconnected</span>
+        </div>
+
+        <div class="status" id="status" role="status" aria-live="polite">— — —</div>
+
+        <div class="dist">
+          <div class="label">Live distance</div>
+          <div class="val" id="dist" aria-live="polite">-- cm</div>
+        </div>
+
+        <div class="loc" id="loc">Location not shared</div>
+
+        <button class="sos" id="sos">SOS — send my location</button>
+
+        <div class="row">
+          <input id="contact" type="tel" placeholder="Family number e.g. +9198…" aria-label="Family contact number">
+        </div>
+
+        <div class="toggle">
+          <span><strong>Demo mode</strong><br><span class="muted" style="font-size:.85rem">simulate the cane</span></span>
+          <label class="switch">
+            <input type="checkbox" id="demo" aria-label="Demo mode">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- explanation -->
+      <div>
+        <p class="demo-note">The real app is built in <strong>MIT App Inventor</strong> and connects to the cane's <strong>HC-05 (Bluetooth Classic)</strong> module. It receives one line per reading —
+        <code>87,ALERT</code> or <code>250,OK</code> — splits it on the comma, shows the number, and colours the panel. This web page reproduces that same logic in JavaScript so you can see it without hardware.</p>
+        <div class="cards" style="margin-top:20px">
+          <div class="card"><div class="ico">📡</div><h3>Connection status</h3><p>Shows whether the phone is linked to the cane. Turns green when connected.</p></div>
+          <div class="card"><div class="ico">🟢</div><h3>Alert panel</h3><p>Full-width <strong>CLEAR</strong> / <strong>OBSTACLE</strong> so it reads at a glance.</p></div>
+          <div class="card"><div class="ico">📏</div><h3>Live distance</h3><p>The sensor reading in cm, refreshed several times a second.</p></div>
+          <div class="card"><div class="ico">🆘</div><h3>GPS &amp; SOS</h3><p>One button texts the user's location to a saved family contact.</p></div>
+        </div>
+        <p class="demo-note" style="margin-top:18px"><strong>Try:</strong> the SOS button asks the browser for your GPS position, then opens your messaging app pre-filled with a Google&nbsp;Maps link. On a phone this behaves just like the real app.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COVERAGE -->
+<section style="background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <h2>Full-height coverage</h2>
+    <p class="sub">The white cane senses only the ground. Vision Guard fills the gap without replacing it.</p>
+    <table>
+      <tr><th>Zone</th><th>Handled by</th></tr>
+      <tr><td>Ground, kerbs, steps, drains</td><td>The cane shaft (mechanical)</td></tr>
+      <tr><td>Waist to chest</td><td>Cane-mounted ultrasonic sensor</td></tr>
+      <tr><td>Head level</td><td>Sensor glasses</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section>
+  <div class="wrap">
+    <h2>How it works</h2>
+    <p class="sub">Cheap, robust parts doing one job well.</p>
+    <div class="cards">
+      <div class="card"><h3>1. Sense</h3><p>An HC-SR04 emits a 40&nbsp;kHz pulse and times the echo: <em>distance = (echo × speed of sound) ÷ 2</em>.</p></div>
+      <div class="card"><h3>2. Confirm</h3><p>Three consecutive readings must agree before alerting, so a passer-by doesn't trigger a false alarm.</p></div>
+      <div class="card"><h3>3. Warn</h3><p>A vibration motor (cane) or buzzer (glasses) fires locally — no phone needed for the core warning.</p></div>
+      <div class="card"><h3>4. Inform</h3><p>The HC-05 streams live readings to the family app for confirmation, GPS and SOS.</p></div>
+    </div>
+    <p style="margin-top:24px" class="muted">Design principle: <strong>the cane works without power.</strong> If the battery dies, the user still has a full-length cane. Safety never depends on a charge.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p style="font-weight:700;color:#fff;font-size:1.1rem;margin:0 0 6px">Vision Guard</p>
+    <p class="muted" style="color:#94a3b8;margin:0 0 14px">Smart cane &amp; sensor glasses for visually impaired users. MIT licensed — free to build upon.</p>
+    <p style="margin:0">
+      <a href="https://github.com/sunitamehta3333-cell/vision-guard" target="_blank" rel="noopener">Source &amp; hardware</a> ·
+      <a href="https://github.com/sunitamehta3333-cell/vision-guard/blob/main/app/BUILD_GUIDE.md" target="_blank" rel="noopener">App build guide</a> ·
+      <a href="https://github.com/sunitamehta3333-cell/vision-guard/blob/main/README.md" target="_blank" rel="noopener">Full documentation</a>
+    </p>
+    <p class="muted" style="color:#64748b;margin:18px 0 0;font-size:.85rem">This web page is a preview/simulation for demonstration. It is not a medical device and does not replace Orientation &amp; Mobility training.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var ALERT_CM = 100;          // matches cane firmware threshold
+  var statusEl = document.getElementById('status');
+  var distEl   = document.getElementById('dist');
+  var connEl   = document.getElementById('conn');
+  var connState= document.getElementById('connState');
+  var demo     = document.getElementById('demo');
+  var sos      = document.getElementById('sos');
+  var contact  = document.getElementById('contact');
+  var locEl    = document.getElementById('loc');
+
+  var timer = null;
+  var d = 250;                 // current simulated distance (cm)
+  var lastLoc = null;
+
+  // Parse one "87,ALERT" line exactly like the app does.
+  function handleLine(text){
+    if(!text || text.indexOf(',') === -1) return;
+    var parts = text.trim().split(',');
+    var distance = parts[0];
+    var status = (parts[1]||'').trim().toUpperCase();
+    distEl.textContent = distance + ' cm';
+    if(status === 'ALERT'){
+      statusEl.className = 'status obstacle';
+      statusEl.textContent = 'OBSTACLE';
+    }else{
+      statusEl.className = 'status clear';
+      statusEl.textContent = 'CLEAR';
+    }
+  }
+
+  // Smooth-ish random walk so the panel doesn't strobe.
+  function tick(){
+    var step = Math.round((Math.random() - 0.5) * 90);
+    d = Math.max(20, Math.min(400, d + step));
+    handleLine(d + ',' + (d < ALERT_CM ? 'ALERT' : 'OK'));
+  }
+
+  function setConnected(on){
+    if(on){
+      connEl.classList.add('on');
+      connState.textContent = 'Connected (demo)';
+    }else{
+      connEl.classList.remove('on');
+      connState.textContent = 'Disconnected';
+      statusEl.className = 'status';
+      statusEl.textContent = '— — —';
+      distEl.textContent = '-- cm';
+    }
+  }
+
+  demo.addEventListener('change', function(){
+    if(demo.checked){
+      setConnected(true);
+      d = 250;
+      timer = setInterval(tick, 220);   // ~4–5 readings/second
+      tick();
+    }else{
+      clearInterval(timer); timer = null;
+      setConnected(false);
+    }
+  });
+
+  function sendSOS(lat, lng){
+    var num = (contact.value || '').trim();
+    var maps = (lat != null)
+      ? 'https://maps.google.com/?q=' + lat + ',' + lng
+      : '(location unavailable)';
+    var msg = 'SOS. I need help. My location: ' + maps;
+    if(!num){
+      alert('Enter a family contact number first.\n\nMessage that would be sent:\n' + msg);
+      return;
+    }
+    // Opens the phone's SMS app pre-filled (like the app's SendMessage).
+    window.location.href = 'sms:' + encodeURIComponent(num) +
+      '?body=' + encodeURIComponent(msg);
+  }
+
+  sos.addEventListener('click', function(){
+    if(navigator.geolocation){
+      locEl.textContent = 'Getting location…';
+      navigator.geolocation.getCurrentPosition(function(pos){
+        var lat = pos.coords.latitude.toFixed(6);
+        var lng = pos.coords.longitude.toFixed(6);
+        lastLoc = [lat, lng];
+        locEl.textContent = 'Lat ' + lat + '  Lng ' + lng;
+        sendSOS(lat, lng);
+      }, function(){
+        locEl.textContent = 'Location permission denied';
+        sendSOS(null, null);
+      }, {enableHighAccuracy:true, timeout:8000});
+    }else{
+      sendSOS(null, null);
+    }
+  });
+})();
+</script>
+</body>
+</html>
